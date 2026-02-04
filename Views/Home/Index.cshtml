@@ -1,0 +1,348 @@
+﻿@model VeterinaryClinic.Models.PatientViewModel
+@{
+    ViewData["Title"] = "Ветеринарная клиника 'Друг'";
+}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+            .header h1 {
+                font-size: 32px;
+                margin-bottom: 10px;
+            }
+
+            .header p {
+                font-size: 16px;
+                opacity: 0.9;
+            }
+
+        .main-content {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #e9ecef;
+        }
+
+            .section h2 {
+                color: #333;
+                margin-bottom: 20px;
+                font-size: 20px;
+                border-bottom: 2px solid #667eea;
+                padding-bottom: 10px;
+            }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 8px;
+                color: #333;
+                font-weight: 500;
+            }
+
+            .form-group input,
+            .form-group select {
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #e1e1e1;
+                border-radius: 5px;
+                font-size: 14px;
+                transition: border-color 0.3s;
+            }
+
+                .form-group input:focus,
+                .form-group select:focus {
+                    outline: none;
+                    border-color: #667eea;
+                }
+
+        .add-btn {
+            width: 100%;
+            padding: 15px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+            .add-btn:hover {
+                background: #219653;
+            }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+            .filters select,
+            .filters input {
+                flex: 1;
+                padding: 10px;
+                border: 2px solid #e1e1e1;
+                border-radius: 5px;
+            }
+
+        .patients-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+            .patients-table th,
+            .patients-table td {
+                padding: 15px;
+                text-align: left;
+                border-bottom: 1px solid #e9ecef;
+            }
+
+            .patients-table th {
+                background: #667eea;
+                color: white;
+                font-weight: 600;
+            }
+
+            .patients-table tr:hover {
+                background: #f8f9fa;
+            }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid #667eea;
+        }
+
+            .stat-card h3 {
+                color: #666;
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+
+            .stat-card .number {
+                font-size: 28px;
+                font-weight: bold;
+                color: #333;
+            }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+            .delete-btn:hover {
+                background: #c0392b;
+            }
+
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Ветеринарная клиника "Друг"</h1>
+            <p>Система управления пациентами на ASP.NET</p>
+        </div>
+
+        @if (TempData["Message"] != null)
+        {
+            <div class="alert @((bool)(TempData["IsSuccess"] ?? false) ? "alert-success" : "alert-error")">
+                @TempData["Message"]
+            </div>
+        }
+
+        <div class="main-content">
+            <div class="left-column">
+                <div class="stats">
+                    <div class="stat-card">
+                        <h3>Всего пациентов</h3>
+                        <div class="number">@Model.TotalPatients</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Собак</h3>
+                        <div class="number">@Model.DogsCount</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Кошек</h3>
+                        <div class="number">@Model.CatsCount</div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h2>Добавить пациента</h2>
+                    <form asp-controller="Home" asp-action="AddPatient" method="post">
+                        @Html.AntiForgeryToken()
+
+                        <div class="form-group">
+                            <label for="petName">Имя питомца</label>
+                            <input type="text" id="petName" name="Name" placeholder="Введите имя питомца" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="petType">Вид</label>
+                            <select id="petType" name="Species" required>
+                                <option value="">Выберите вид</option>
+                                <option value="Собака">Собака</option>
+                                <option value="Кошка">Кошка</option>
+                                <option value="Другое">Другое</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="petBreed">Порода</label>
+                            <input type="text" id="petBreed" name="Breed" placeholder="Введите породу" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="petAge">Возраст</label>
+                            <input type="text" id="petAge" name="Age" placeholder="Например: 3 года" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ownerName">Владелец</label>
+                            <input type="text" id="ownerName" name="Owner" placeholder="Введите ФИО владельца" required>
+                        </div>
+
+                        <button type="submit" class="add-btn">Добавить пациента</button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="right-column">
+                <div class="section">
+                    <h2>Список пациентов</h2>
+
+                    <form method="get" id="filterForm">
+                        <div class="filters">
+                            <select id="typeFilter" name="typeFilter" onchange="this.form.submit()">
+                                <option value="">Все виды</option>
+                                <option value="Собака" selected="@(Model.TypeFilter == "Собака")">Собаки</option>
+                                <option value="Кошка" selected="@(Model.TypeFilter == "Кошка")">Кошки</option>
+                                <option value="Другое" selected="@(Model.TypeFilter == "Другое")">Другое</option>
+                            </select>
+                            <input type="text" id="searchInput" name="searchFilter" placeholder="Поиск по имени..." value="@Model.SearchFilter" oninput="this.form.submit()">
+                        </div>
+                    </form>
+
+                    <table class="patients-table">
+                        <thead>
+                            <tr>
+                                <th>Имя</th>
+                                <th>Вид</th>
+                                <th>Порода</th>
+                                <th>Возраст</th>
+                                <th>Владелец</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var patient in Model.Patients)
+                            {
+                                <tr>
+                                    <td>@patient.Name</td>
+                                    <td>@patient.Species</td>
+                                    <td>@patient.Breed</td>
+                                    <td>@patient.Age</td>
+                                    <td>@patient.Owner</td>
+                                    <td>
+                                        <form asp-controller="Home" asp-action="DeletePatient" method="post" style="display: inline;">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@patient.Id" />
+                                            <button type="submit" class="delete-btn" onclick="return confirm('Вы уверены, что хотите удалить этого пациента?')">Удалить</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Авто-сабмит формы при изменении фильтров
+        document.getElementById('typeFilter').addEventListener('change', function() {
+            document.getElementById('filterForm').submit();
+        });
+    </script>
+</body>
+</html>
